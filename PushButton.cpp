@@ -109,100 +109,54 @@ int main()
 	
 // ************** Put your code here **********************
 
+   int num = ReadAllSwitches(pBase);
+   WriteAllLeds(pBase,num);
+   int read;
    bool active = true;
-   bool repeat;
-   char choice;
    
-   while (active) {  
+   while (active) {
    
-         repeat = true;   
-         int inputLED, LEDState, inputSwitch, outputSwitch;
-         cout << "Please input an LED number to turn on/off: ";
-         cin >> inputLED;
-         cout << endl;
-         cout << "Please input the desired state of that LED (0 or 1): ";
-         cin >> LEDState;
-         cout << endl;
-         cout << "Please input a switch number to read: ";
-         cin >> inputSwitch;
-         cout << endl;
+   	cout << num;
    
-         Write1Led(pBase, inputLED, LEDState);
-         outputSwitch = Read1Switch(pBase, inputSwitch);
-         if (outputSwitch == 1)
-            cout << "Switch #" << inputSwitch << " is on." << endl;
-         else
-             cout << "Switch #" << inputSwitch << " is off." << endl << endl;
-         cout << "Would you like to change an LED or check a switch again? (y/n): ";
-         
-         while (repeat) {
-         
-               cin >> choice;
-         
-               switch (choice) {
-         
-                      case 'y' : {
-                           cout << endl << endl;
-                           repeat = false;
-                      }
-                      break;
-                
-                      case 'n' : {
-                           cout << endl << "Moving onto binary reader & printer.." << endl;
-                           repeat = false;
-                           active = false;
-                      }
-                      break;
-                
-                      default : {
-                              cout << "ERROR: Please input a valid option: ";
-                      }
-                      break;
-         
-                }
-         }
-         
+   	read = PushButtonGet(pBase);
+	
+	if (read == 1) {
+	
+		num = num*2;
+		WriteAllLeds(pBase,num);
+	
 	}
- 
-  active = true;
-  repeat = true;
- 
-  while (active) {  
-   
-        repeat = true;
-        switchRead = ReadAllSwitches(pBase);
-        WriteAllLeds(pBase, switchRead);
-        cout << switchRead << endl;
-        cout << "Would you like to read the binary value to the LEDs again? (y/n): ";
-         
-         while (repeat) {
-         
-               cin >> choice;
-         
-               switch (choice) {
-         
-                      case 'y' : {
-                           cout << endl << endl;
-                           repeat = false;
-                      }
-                      break;
-                
-                      case 'n' : {
-                           cout << endl << "Closing program.." << endl;
-                           repeat = false;
-                           active = false;
-                      }
-                      break;
-                
-                      default : {
-                              cout << "ERROR: Please input a valid option: ";
-                      }
-                      break;
-         
-                }
-         }
-         
+	
+	if (read == 2) {
+	
+		num = num/2;;
+		WriteAllLeds(pBase,num);
+	
 	}
+	
+	if (read == 3) {
+	
+		num++;
+		WriteAllLeds(pBase,num);
+	
+	}
+	
+	if (read == 4) {
+	
+		num--;
+		WriteAllLeds(pBase,num);
+	
+	}
+	
+	if (read == 1) {
+
+		num = ReadAllSwitches(pBase);
+		WriteAllLeds(pBase,num);
+	
+	}
+   
+   }
+   
   
   // Done
 	Finalize(pBase, fd);
@@ -251,5 +205,26 @@ void WriteAllLeds(char *pBase, int value) {
     Write1Led(pBase, 6, (value/64)%2);
     Write1Led(pBase, 7, (value/128)%2);
 
+
+}
+
+int PushButtonGet(char *pBase) {
+    if (RegisterRead(pBase, gpio_pbtnl_offset) == 1)
+        return 1;
+
+    else
+        if (RegisterRead(pBase, gpio_pbtnr_offset) == 1)
+            return 2;
+        else
+            if (RegisterRead(pBase, gpio_pbtnu_offset) == 1)
+                return 3;
+            else
+                if (RegisterRead(pBase, gpio_pbtnd_offset) == 1)
+                    return 4;
+                else
+                    if (RegisterRead(pBase, gpio_pbtnc_offset) == 1)
+                        return 5;
+			else
+				return 0;
 
 }
